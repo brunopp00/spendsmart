@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
@@ -25,7 +24,14 @@ export default function SignUp() {
   const { register, handleSubmit } = useForm<SignUpValues>()
 
   const signUp: SubmitHandler<SignUpValues> = async () => {
-    const data = await fetch('http://localhost:3001/signup/api')
+    const data = await fetch('http://localhost:3001/signup/api', {
+      body: JSON.stringify({
+        username: 'test',
+        email: 'test',
+        password: 'test',
+      }),
+      method: 'POST',
+    })
     console.log(data)
   }
 
