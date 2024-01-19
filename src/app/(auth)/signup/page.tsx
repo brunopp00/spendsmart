@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Toaster } from '@/components/ui/sonner'
 import Link from 'next/link'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -26,7 +25,7 @@ export default function SignUp() {
   const { register, handleSubmit } = useForm<SignUpValues>()
 
   const signUp: SubmitHandler<SignUpValues> = async (values) => {
-    await fetch('http://localhost:3000/signup/api', {
+    await fetch('/signup/api', {
       body: JSON.stringify({
         username: values.username,
         email: values.email,
@@ -37,10 +36,14 @@ export default function SignUp() {
       .then((res) => res.json())
       .then((data) => {
         if (data.error) {
-          console.log(data)
           toast.error(data.error, {
             duration: 5000,
           })
+        } else {
+          toast.success('Signed up successfully!', {
+            duration: 5000,
+          })
+          window.location.href = '/signin'
         }
       })
   }
@@ -73,12 +76,10 @@ export default function SignUp() {
             <div>
               <Label>Password</Label>
               <Input
+                type="password"
                 {...register('password', { required: true })}
                 placeholder="Password"
               />
-              <p className="cursor-pointer text-end text-xs underline">
-                Forgot password?
-              </p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3">
@@ -94,7 +95,6 @@ export default function SignUp() {
           </CardFooter>
         </form>
       </Card>
-      <Toaster />
     </div>
   )
 }
