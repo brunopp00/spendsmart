@@ -11,8 +11,10 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Toaster } from '@/components/ui/sonner'
 import Link from 'next/link'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 interface SignUpValues {
   username: string
@@ -23,16 +25,24 @@ interface SignUpValues {
 export default function SignUp() {
   const { register, handleSubmit } = useForm<SignUpValues>()
 
-  const signUp: SubmitHandler<SignUpValues> = async () => {
-    const data = await fetch('http://localhost:3001/signup/api', {
+  const signUp: SubmitHandler<SignUpValues> = async (values) => {
+    await fetch('http://localhost:3000/signup/api', {
       body: JSON.stringify({
-        username: 'test',
-        email: 'test',
-        password: 'test',
+        username: values.username,
+        email: values.email,
+        password: values.password,
       }),
       method: 'POST',
     })
-    console.log(data)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          console.log(data)
+          toast.error(data.error, {
+            duration: 5000,
+          })
+        }
+      })
   }
 
   return (
@@ -84,6 +94,7 @@ export default function SignUp() {
           </CardFooter>
         </form>
       </Card>
+      <Toaster />
     </div>
   )
 }
