@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { SignUpUser } from './actions'
 
 interface SignUpValues {
   username: string
@@ -25,27 +26,17 @@ export default function SignUp() {
   const { register, handleSubmit } = useForm<SignUpValues>()
 
   const signUp: SubmitHandler<SignUpValues> = async (values) => {
-    await fetch('/signup/api', {
-      body: JSON.stringify({
-        username: values.username,
-        email: values.email,
-        password: values.password,
-      }),
-      method: 'POST',
+    SignUpUser(values).then((res) => {
+      if (res.status) {
+        toast.success('Signed up successfully!', {
+          duration: 5000,
+        })
+      } else {
+        toast.error(res.error, {
+          duration: 5000,
+        })
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          toast.error(data.error, {
-            duration: 5000,
-          })
-        } else {
-          toast.success('Signed up successfully!', {
-            duration: 5000,
-          })
-          window.location.href = '/signin'
-        }
-      })
   }
 
   return (

@@ -1,10 +1,9 @@
-'use client'
-
 import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -13,39 +12,24 @@ import { useUserStore } from '@/store/user'
 import { format } from 'date-fns'
 import { FormCreateExpense } from './components/FormCreateExpense'
 import { DeleteExpense } from './components/DeleteExpense'
-import { useCallback, useEffect, useState } from 'react'
+import { prisma } from '@/lib/prisma'
+import PDFPage from './pdf'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
-interface ExpenseListProps {
-  id: number
-  name: string
-  description: string
-  amount: number
-  date: string
-}
-
-export default function ExpenseList() {
+export default async function ExpenseList() {
   const {
     state: { user },
   } = useUserStore.getState()
 
-  const [lista, setLista] = useState<ExpenseListProps[]>([])
+  const lista = await prisma.expense.findMany({
+    where: {
+      userId: user?.id,
+    },
+  })
 
-  const getList = useCallback(() => {
-    fetch('http://localhost:3001/expense/api', {
-      body: JSON.stringify({
-        userId: user?.id,
-      }),
-      method: 'POST',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data)
-        setLista(data)
-      })
-  }, [user?.id])
-
-  useEffect(() => getList(), [getList])
-  console.log(lista)
+  const sumOfValues = lista.reduce((acc, item) => {
+    return acc + item.amount // Using acc directly since it represents the accumulated value
+  }, 0)
 
   return (
     <div className="flex flex-col gap-10">
@@ -54,32 +38,49 @@ export default function ExpenseList() {
         <Input className="w-64 bg-transparent dark:text-white" type="date" />
       </div>
       <hr />
-      <div className="text-end">
-        <FormCreateExpense getList={getList} />
+      <div className="flex justify-end gap-3">
+        <PDFPage data={lista} />
+        <FormCreateExpense />
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Categories Names</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Amount</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {lista.map((item) => (
-            <TableRow key={item.id} className="dark:text-white">
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.description}</TableCell>
-              <TableCell>{format(new Date(item.date), 'dd/MM/yyyy')}</TableCell>
-              <TableCell>
-                R$ {item.amount ? item.amount.toFixed(2) : null}
-              </TableCell>
-              <DeleteExpense getList={getList} id={item.id} />
+      <ScrollArea className="h-[600px] overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Categories Names</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {lista.map((item) => (
+              <TableRow key={item.id} className="dark:text-white">
+                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.description}</TableCell>
+                <TableCell>
+                  {format(new Date(item.date), 'dd/MM/yyyy')}
+                </TableCell>
+                <TableCell>
+                  R$ {item.amount ? item.amount.toFixed(2) : null}
+                </TableCell>
+                <DeleteExpense id={item.id} />
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell>Total</TableCell>
+              <TableCell />
+              <TableCell />
+              <TableCell>
+                R$ {sumOfValues ? sumOfValues.toFixed(2) : '00.00'}
+              </TableCell>
+              <TableCell />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </ScrollArea>
     </div>
   )
 }

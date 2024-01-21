@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { SignInUser } from './actions'
 
 interface SignInProps {
   email: string
@@ -30,27 +31,21 @@ export default function SignIn() {
   const { register, handleSubmit } = useForm<SignInProps>()
 
   const signIn: SubmitHandler<SignInProps> = async (values) => {
-    await fetch('/signin/api', {
-      body: JSON.stringify({
-        email: values.email,
-        password: values.password,
-      }),
-      method: 'POST',
-    })
-      .then((res) => res.json())
-      .then(async (data) => {
-        if (data.error) {
-          toast.error(data.error, {
-            duration: 5000,
-          })
-        } else {
-          toast.success('Signed in successfully!', {
-            duration: 5000,
-          })
-          await addUser(data.user)
-          router.push('/dashboard')
+    await SignInUser(values).then(async (res) => {
+      if (res.status) {
+        toast.success('Signed in successfully!', {
+          duration: 5000,
+        })
+        if (res.user) {
+          await addUser(res.user)
         }
-      })
+        router.push('/dashboard')
+      } else {
+        toast.error(res.error, {
+          duration: 5000,
+        })
+      }
+    })
   }
 
   return (

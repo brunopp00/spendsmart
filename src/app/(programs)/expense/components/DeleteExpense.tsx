@@ -2,38 +2,25 @@
 
 import { TableCell } from '@/components/ui/table'
 import { FaTrash } from 'react-icons/fa'
+import { deleteExpense } from '../actions'
 import { toast } from 'sonner'
 
 interface DeleteExpenseProps {
   id: number
-  getList: () => void
 }
 
-export const DeleteExpense = ({ id, getList }: DeleteExpenseProps) => {
-  const deleteExpense = async (id: number) => {
-    fetch('/expense/api', {
-      body: JSON.stringify({
-        id,
-      }),
-      method: 'DELETE',
+export const DeleteExpense = ({ id }: DeleteExpenseProps) => {
+  const handleSubmit = (id: number) => {
+    deleteExpense(id).then((res) => {
+      if (res?.error) {
+        toast.error(res.error, { duration: 5000 })
+      } else {
+        toast.success(res.message, { duration: 5000 })
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          toast.error(data.error, {
-            duration: 5000,
-          })
-        } else {
-          toast.success('Expense deleted successfully!', {
-            duration: 5000,
-          })
-          getList()
-        }
-      })
   }
-
   return (
-    <TableCell onClick={() => deleteExpense(id)}>
+    <TableCell onClick={() => handleSubmit(id)}>
       <FaTrash title="Delete Expense" size={18} className="cursor-pointer" />
     </TableCell>
   )

@@ -13,20 +13,20 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { format } from 'date-fns'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { createdExpense } from '../actions'
 import { toast } from 'sonner'
+import { useState } from 'react'
 
-interface CreatedExpenseProps {
+export interface CreatedExpenseProps {
   name: string
   description: string
   amount: number
   date: string
 }
 
-interface FormCreateExpenseProps {
-  getList: () => void
-}
+export const FormCreateExpense = () => {
+  const [open, setOpen] = useState(false)
 
-export const FormCreateExpense = ({ getList }: FormCreateExpenseProps) => {
   const { register, handleSubmit } = useForm<CreatedExpenseProps>({
     defaultValues: {
       name: '',
@@ -36,38 +36,28 @@ export const FormCreateExpense = ({ getList }: FormCreateExpenseProps) => {
     },
   })
 
-  const user = window.localStorage.getItem('userSpendSmart')
+  const user =
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem('userSpendSmart')
+      : null
 
-  const createdExpense: SubmitHandler<CreatedExpenseProps> = async (values) => {
-    fetch('/expense/api', {
-      body: JSON.stringify({
-        name: values.name,
-        description: values.description,
-        amount: values.amount ? Number(values.amount) : 0,
-        date: values.date ? new Date(values.date) : new Date(),
-        userId: JSON.parse(user || '').id,
-      }),
-      method: 'POST',
+  const submitForm: SubmitHandler<CreatedExpenseProps> = async (values) => {
+    await createdExpense(values, JSON.parse(user || '')).then((res) => {
+      if (res?.error) {
+        toast.error(res.error, { duration: 5000 })
+      } else {
+        setOpen(false)
+        toast.success(res.message, { duration: 5000 })
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          toast.error(data.error, {
-            duration: 5000,
-          })
-        } else {
-          toast.success('Expense created successfully!', {
-            duration: 5000,
-          })
-          getList()
-        }
-      })
   }
 
   return (
-    <Dialog>
+    <Dialog open={open}>
       <DialogTrigger asChild>
-        <Button className="w-32">Add Expense</Button>
+        <Button onClick={() => setOpen(true)} className="w-32">
+          Add Expense
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -78,7 +68,7 @@ export const FormCreateExpense = ({ getList }: FormCreateExpenseProps) => {
         </DialogHeader>
         <form
           className="grid grid-cols-subgrid gap-4"
-          onSubmit={handleSubmit(createdExpense)}
+          onSubmit={handleSubmit(submitForm)}
         >
           <div>
             <Label>Name</Label>

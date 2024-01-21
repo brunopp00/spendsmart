@@ -12,19 +12,9 @@ export const LeftPage = () => {
   const path = usePathname()
 
   const {
-    actions: { removeUser, addUser },
+    actions: { removeUser },
     state: { user },
   } = useUserStore.getState()
-
-  const userSpendSmart = window.localStorage.getItem('userSpendSmart')
-
-  if (!user && userSpendSmart) {
-    addUser(JSON.parse(userSpendSmart))
-  }
-
-  if (!user && !userSpendSmart) {
-    router.push('/signin')
-  }
 
   const tradeLink = (link: string) => router.push(link)
 
