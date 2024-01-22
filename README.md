@@ -18,3 +18,29 @@ Automatize o gerenciamento de despesas recorrentes com nosso sistema de CRUD ded
 Exportação de PDF
 Mantenha um registro organizado e exporte facilmente a lista de gastos para um arquivo PDF. Desfrute da flexibilidade de imprimir ou arquivar seus registros financeiros para referência futura.
 
+Como Iniciar
+Clone o Repositório
+
+bash
+Copy code
+git clone [https://github.com/seu-usuario/spend-smart.git](https://github.com/brunopp00/spendsmart.git)
+cd spend-smart
+Instale as Dependências
+
+bash
+Copy code
+npm install
+Configure as Variáveis de Ambiente
+Crie um arquivo .env na raiz do projeto e defina as variáveis de ambiente necessárias, como chaves de API e configurações específicas.
+
+Execute o Projeto
+
+bash
+Copy code
+npm run dev
+Acesse o SpendSmart em http://localhost:3000 e comece a gerenciar suas finanças de maneira inteligente e estilosa!
+
+Contribuições
+Contribuições são sempre bem-vindas! Sinta-se à vontade para abrir issues, sugerir melhorias ou enviar pull requests para aprimorar o SpendSmart.
+
+Obrigado por escolher o SpendSmart para o seu controle financeiro. Controle seus gastos com estilo e eficácia!
