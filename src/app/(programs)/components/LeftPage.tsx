@@ -3,7 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useUserStore } from '@/store/user'
 import { usePathname, useRouter } from 'next/navigation'
-import { FaClipboardList } from 'react-icons/fa'
+import { useEffect } from 'react'
+import { FaCalendar, FaClipboardList } from 'react-icons/fa'
 import { IoLogOutOutline } from 'react-icons/io5'
 import { RiLayoutGridFill } from 'react-icons/ri'
 
@@ -12,19 +13,28 @@ export const LeftPage = () => {
   const path = usePathname()
 
   const {
-    actions: { removeUser },
+    actions: { removeUser, addUser },
     state: { user },
   } = useUserStore.getState()
 
   const tradeLink = (link: string) => router.push(link)
 
-  const getInitials = (name?: string) => {
+  const getInitials = (name?: string | null) => {
     const names = name?.split(' ')
 
     const initials = names?.map((part) => part.charAt(0).toUpperCase())
 
     return initials?.join('')
   }
+
+  useEffect(() => {
+    const userSpendSmart =
+      typeof window !== 'undefined' && localStorage.getItem('userSpendSmart')
+
+    if (userSpendSmart && JSON.parse(userSpendSmart)) {
+      addUser(JSON.parse(userSpendSmart))
+    }
+  }, [addUser, user])
 
   return (
     <div
@@ -52,6 +62,16 @@ export const LeftPage = () => {
             title="Expense List"
           />
         </div>
+        <div
+          className={`rounded-full border  p-3 ${path === '/recurring' ? 'border-black bg-black' : 'border-white'}`}
+        >
+          <FaCalendar
+            onClick={() => tradeLink('/recurring')}
+            className={`cursor-pointer  ${path === '/recurring' ? 'text-white' : 'text-black'} transition-colors hover:text-gray-300 dark:hover:text-white`}
+            size={32}
+            title="Recurring Expense"
+          />
+        </div>
       </div>
       <div className="flex flex-col items-center gap-10">
         <div>
@@ -62,7 +82,10 @@ export const LeftPage = () => {
         </div>
         <div>
           <IoLogOutOutline
-            onClick={removeUser}
+            onClick={() => {
+              removeUser()
+              router.push('/')
+            }}
             className="cursor-pointer text-black transition-colors hover:text-gray-300 dark:hover:text-white"
             size={32}
             title="Log out"

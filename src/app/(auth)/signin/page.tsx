@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { SignInUser } from './actions'
+import { useEffect } from 'react'
 
 interface SignInProps {
   email: string
@@ -28,6 +29,7 @@ export default function SignIn() {
   const {
     actions: { addUser },
   } = useUserStore()
+
   const { register, handleSubmit } = useForm<SignInProps>()
 
   const signIn: SubmitHandler<SignInProps> = async (values) => {
@@ -47,6 +49,17 @@ export default function SignIn() {
       }
     })
   }
+
+  useEffect(() => {
+    const user =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('userSpendSmart')
+        : null
+
+    if (user) {
+      router.replace('/dashboard')
+    }
+  }, [router])
 
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center gap-10">
@@ -68,9 +81,6 @@ export default function SignIn() {
                 {...register('password')}
                 placeholder="Password"
               />
-              {/* <p className="cursor-pointer text-end text-xs underline">
-                Forgot password?
-              </p> */}
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3">

@@ -2,13 +2,9 @@
 
 import { revalidatePath } from 'next/cache'
 import { CreatedExpenseProps } from './components/FormCreateExpense'
-import { UserProps } from '@/types/user'
 import { prisma } from '@/lib/prisma'
 
-export async function createdExpense(
-  values: CreatedExpenseProps,
-  user: UserProps,
-) {
+export async function createdExpense(values: CreatedExpenseProps) {
   try {
     await prisma.expense.create({
       data: {
@@ -16,7 +12,7 @@ export async function createdExpense(
         description: values.description,
         amount: values.amount ? Number(values.amount) : 0,
         date: values.date ? new Date(values.date) : new Date(),
-        userId: user?.id,
+        userId: values?.userId || 0,
       },
     })
     revalidatePath('/expense')
@@ -38,5 +34,32 @@ export async function deleteExpense(id: number) {
     return { message: 'Expense deleted' }
   } catch (error) {
     return { error: 'Something went wrong' }
+  }
+}
+
+export async function importRecussing(userId: number) {
+  try {
+    const recurrings = await prisma.recurringExpense.findMany({
+      where: {
+        userId,
+      },
+    })
+    await recurrings.map((item) =>
+      prisma.expense
+        .create({
+          data: {
+            name: item.name,
+            description: item.description,
+            amount: item.amount,
+            date: new Date(),
+            userId,
+          },
+        })
+        .then((res) => res.id),
+    )
+    revalidatePath('/expense')
+    return { status: true, message: 'Recurring imported' }
+  } catch (error) {
+    return { error: 'Something went wrong', status: false }
   }
 }

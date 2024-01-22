@@ -13,44 +13,44 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { format } from 'date-fns'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { createdExpense } from '../actions'
 import { toast } from 'sonner'
+import { createdRecurring } from '../actions'
 import { useUserStore } from '@/store/user'
 
-export interface CreatedExpenseProps {
+export interface RecurringExpenseProps {
   name: string
   description: string
   amount: number
-  date: string
+  dtExpire: string
   userId: number | undefined
 }
 
-export const FormCreateExpense = () => {
+export const CreateRecurring = () => {
   const {
     state: { user },
   } = useUserStore()
 
-  const { register, handleSubmit, reset } = useForm<CreatedExpenseProps>({
+  const { register, handleSubmit, reset } = useForm<RecurringExpenseProps>({
     defaultValues: {
       name: '',
       description: '',
       amount: 0,
-      date: format(new Date(), 'yyyy-MM-dd'),
+      dtExpire: format(new Date(), 'yyyy-MM-dd'),
       userId: user?.id,
     },
   })
 
-  const submitForm: SubmitHandler<CreatedExpenseProps> = async (values) => {
+  const submitForm: SubmitHandler<RecurringExpenseProps> = async (values) => {
     const obj = {
       ...values,
       userId: user?.id,
     }
-    await createdExpense(obj).then((res) => {
-      if (res?.error) {
-        toast.error(res.error, { duration: 5000 })
-      } else {
+    await createdRecurring(obj).then((res) => {
+      if (res.status) {
         reset()
         toast.success(res.message, { duration: 5000 })
+      } else {
+        toast.error(res.error, { duration: 5000 })
       }
     })
   }
@@ -58,13 +58,13 @@ export const FormCreateExpense = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-32">Add Expense</Button>
+        <Button className="w-32">Add Recurring</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Expense</DialogTitle>
+          <DialogTitle>Add Recurring</DialogTitle>
           <DialogDescription>
-            Fill the form below to add a new expense
+            Fill out the form below to add a recurring expense
           </DialogDescription>
         </DialogHeader>
         <form
@@ -90,9 +90,9 @@ export const FormCreateExpense = () => {
             />
           </div>
           <div>
-            <Label>Date</Label>
+            <Label>Expire Date</Label>
             <Input
-              {...register('date', { required: true })}
+              {...register('dtExpire', { required: true })}
               type="date"
               placeholder="Date"
             />

@@ -1,5 +1,3 @@
-'use client'
-
 import { LeftPage } from './components/LeftPage'
 
 interface DashboardLayoutProps {

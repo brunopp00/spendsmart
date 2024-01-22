@@ -1,4 +1,3 @@
-import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -15,34 +14,35 @@ import { DeleteExpense } from './components/DeleteExpense'
 import { prisma } from '@/lib/prisma'
 import PDFPage from './pdf'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { ImportRecurring } from './components/ImportRecurring'
 
 export default async function ExpenseList() {
   const {
     state: { user },
   } = useUserStore.getState()
 
-  const lista = await prisma.expense.findMany({
+  const list = await prisma.expense.findMany({
     where: {
       userId: user?.id,
     },
   })
 
-  const sumOfValues = lista.reduce((acc, item) => {
-    return acc + item.amount // Using acc directly since it represents the accumulated value
+  const sumOfValues = list.reduce((acc, item) => {
+    return acc + item.amount
   }, 0)
 
   return (
     <div className="flex flex-col gap-10">
       <div className="flex justify-between">
         <h1 className="text-3xl dark:text-white">Expense List</h1>
-        <Input className="w-64 bg-transparent dark:text-white" type="date" />
+        <div className="flex gap-3">
+          <PDFPage data={list} />
+          <ImportRecurring />
+          <FormCreateExpense />
+        </div>
       </div>
       <hr />
-      <div className="flex justify-end gap-3">
-        <PDFPage data={lista} />
-        <FormCreateExpense />
-      </div>
-      <ScrollArea className="h-[600px] overflow-x-auto">
+      <ScrollArea className="h-[650px]">
         <Table>
           <TableHeader>
             <TableRow>
@@ -54,13 +54,11 @@ export default async function ExpenseList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {lista.map((item) => (
+            {list.map((item) => (
               <TableRow key={item.id} className="dark:text-white">
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.description}</TableCell>
-                <TableCell>
-                  {format(new Date(item.date), 'dd/MM/yyyy')}
-                </TableCell>
+                <TableCell>{format(item.date, 'dd/MM/yyyy')}</TableCell>
                 <TableCell>
                   R$ {item.amount ? item.amount.toFixed(2) : null}
                 </TableCell>
