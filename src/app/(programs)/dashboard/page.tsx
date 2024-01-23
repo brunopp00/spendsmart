@@ -1,6 +1,7 @@
 import { useUserStore } from '@/store/user'
-import { BarChart } from './components/BarChart'
+import { BarChartDashboard } from './components/BarChart'
 import { prisma } from '@/lib/prisma'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export interface ChartDataProps {
   mes: string
@@ -56,12 +57,17 @@ export default async function Dashboard() {
         <h1 className="text-3xl dark:text-white">Dashboard</h1>
         <hr />
       </div>
-      <div className="flex h-full justify-center gap-10">
-        <div className="flex w-[80%] flex-col gap-1 rounded-md bg-gray-300 p-5">
-          <h1 className="text-2xl dark:text-white">Gastos Mensais</h1>
-          <hr />
-          <BarChart chartData={mesesComGastos.reverse()} />
-        </div>
+      <div className="grid grid-cols-4">
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle className="text-2xl dark:text-white">
+              Gastos Mensais
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BarChartDashboard chartData={mesesComGastos.reverse()} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

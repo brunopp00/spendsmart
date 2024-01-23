@@ -1,46 +1,43 @@
 'use client'
 
-import { Bar } from 'react-chartjs-2'
 import {
-  CategoryScale,
-  Chart,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-} from 'chart.js'
-import { ChartDataProps } from '../page'
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-)
+import { ChartDataProps } from '../page'
 
 interface BarChartProps {
   chartData: ChartDataProps[]
 }
 
-export const BarChart = ({ chartData }: BarChartProps) => {
+export const BarChartDashboard = ({ chartData }: BarChartProps) => {
   return (
-    <Bar
-      options={{
-        datasets: { bar: { borderRadius: 10 } },
-      }}
-      data={{
-        labels: chartData.map(
-          (item) => `${item.mes} R$(${item.valor.toLocaleString('pt-BR')})`,
-        ),
-        datasets: [
-          {
-            label: 'Valor',
-            backgroundColor: ['#efefef', 'black'],
-            data: chartData.map((item) => item.valor),
-          },
-        ],
-      }}
-    />
+    <ResponsiveContainer width="100%" height={200}>
+      <LineChart data={chartData} style={{ fontSize: 12 }}>
+        <XAxis dataKey="mes" tickLine={false} axisLine={false} dy={16} />
+        <YAxis
+          stroke="#888"
+          width={80}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(value: number) =>
+            value.toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            })
+          }
+        />
+
+        <CartesianGrid className="stroke-muted" vertical={false} />
+        <Tooltip />
+        <Line type="linear" strokeWidth={2} dataKey="valor" />
+      </LineChart>
+    </ResponsiveContainer>
   )
 }
