@@ -1,4 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
+
 import {
   Table,
   TableBody,
@@ -8,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { format } from 'date-fns'
 import { DeleteExpense } from './DeleteExpense'
 
 interface ListExpenseProps {
@@ -42,7 +42,7 @@ export const ListExpense = ({ list, sumOfValues }: ListExpenseProps) => {
             <TableRow key={item.id} className="dark:text-white">
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.description}</TableCell>
-              <TableCell>{format(item.date, 'dd/MM/yyyy')}</TableCell>
+              <TableCell>{item.date.toDateString()}</TableCell>
               <TableCell>
                 R$ {item.amount ? item.amount.toFixed(2) : null}
               </TableCell>
