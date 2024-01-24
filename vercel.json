@@ -1,0 +1,8 @@
+{
+  "build": {
+    "scripts": {
+      "build": "next build",
+      "postbuild": "npm run prisma"
+    }
+  }
+}
