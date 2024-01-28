@@ -42,7 +42,7 @@ export const ListExpense = ({ list, sumOfValues }: ListExpenseProps) => {
             <TableRow key={item.id} className="dark:text-white">
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.description}</TableCell>
-              <TableCell>{item.date.toDateString()}</TableCell>
+              <TableCell>{item.date.toLocaleDateString()}</TableCell>
               <TableCell>
                 R$ {item.amount ? item.amount.toFixed(2) : null}
               </TableCell>
