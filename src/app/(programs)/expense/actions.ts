@@ -15,6 +15,7 @@ export async function createdExpense(values: CreatedExpenseProps) {
         userId: values?.userId || 0,
       },
     })
+    revalidatePath('/dashboard')
     revalidatePath('/expense')
 
     return { message: 'Expense created' }
@@ -30,6 +31,7 @@ export async function deleteExpense(id: number) {
         id,
       },
     })
+    revalidatePath('/dashboard')
     revalidatePath('/expense')
     return { message: 'Expense deleted' }
   } catch (error) {
@@ -57,6 +59,7 @@ export async function importRecussing(userId: number) {
         })
         .then((res) => res.id),
     )
+    revalidatePath('/dashboard')
     revalidatePath('/expense')
     return { status: true, message: 'Recurring imported' }
   } catch (error) {

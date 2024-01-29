@@ -23,6 +23,7 @@ export async function SignInUser(values: SignInProps) {
       return { message: 'User logged in', user: userExist, status: true }
     }
   } catch (error) {
+    console.log(error)
     return { error: 'Something went wrong', status: false }
   }
 }
