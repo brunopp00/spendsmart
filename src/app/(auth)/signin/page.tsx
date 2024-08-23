@@ -18,6 +18,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { SignInUser } from './actions'
 import { useEffect } from 'react'
+import nookies from 'nookies'
 
 interface SignInProps {
   email: string
@@ -51,12 +52,8 @@ export default function SignIn() {
   }
 
   useEffect(() => {
-    const user =
-      typeof window !== 'undefined'
-        ? window.localStorage.getItem('userSpendSmart')
-        : null
-
-    if (user) {
+    const cookies = nookies.get(null)
+    if (cookies.userToken) {
       router.replace('/dashboard')
     }
   }, [router])
