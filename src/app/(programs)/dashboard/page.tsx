@@ -1,7 +1,7 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { prisma } from '@/lib/prisma'
 import { useUserStore } from '@/store/user'
 import { BarChartDashboard } from './components/BarChart'
-import { prisma } from '@/lib/prisma'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export interface ChartDataProps {
   mes: string
@@ -57,18 +57,20 @@ export default async function Dashboard() {
         <h1 className="text-3xl dark:text-white">Dashboard</h1>
         <hr />
       </div>
-      <div className="grid grid-cols-4">
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="text-2xl dark:text-white">
-              Gastos Mensais
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BarChartDashboard chartData={mesesComGastos.reverse()} />
-          </CardContent>
-        </Card>
-      </div>
+      {mesesComGastos.length > 0 && (
+        <div className="grid grid-cols-4">
+          <Card className="col-span-4">
+            <CardHeader>
+              <CardTitle className="text-2xl dark:text-white">
+                Gastos Mensais
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BarChartDashboard chartData={mesesComGastos.reverse()} />
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
