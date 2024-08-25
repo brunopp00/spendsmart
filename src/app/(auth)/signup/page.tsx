@@ -15,6 +15,8 @@ import Link from 'next/link'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { SignUpUser } from './actions'
+import { useUserStore } from '@/store/user'
+import { UserProps } from '@/types/user'
 
 interface SignUpValues {
   username: string
@@ -22,21 +24,38 @@ interface SignUpValues {
   password: string
 }
 
+interface SignUpResponse {
+  error: string
+  status: boolean
+  user?: UserProps | null
+}
+
 export default function SignUp() {
+  const {
+    actions: { addUser },
+  } = useUserStore()
   const { register, handleSubmit } = useForm<SignUpValues>()
 
   const signUp: SubmitHandler<SignUpValues> = async (values) => {
-    SignUpUser(values).then((res) => {
-      if (res.status) {
+    try {
+      const res: SignUpResponse | undefined = await SignUpUser(values)
+      if (res && res.status) {
         toast.success('Signed up successfully!', {
           duration: 5000,
         })
+        if (res.user) {
+          addUser(res.user)
+        }
       } else {
-        toast.error(res.error, {
+        toast.error(res?.error || 'An error occurred', {
           duration: 5000,
         })
       }
-    })
+    } catch (error) {
+      toast.error('An unexpected error occurred', {
+        duration: 5000,
+      })
+    }
   }
 
   return (
@@ -46,7 +65,7 @@ export default function SignUp() {
           <CardHeader>
             <CardTitle>Hello!</CardTitle>
             <CardDescription>
-              Wellcome, we have been waiting for you!
+              Welcome, we have been waiting for you!
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">

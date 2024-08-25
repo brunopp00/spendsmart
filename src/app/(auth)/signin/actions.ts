@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcrypt'
 
 interface SignInProps {
   email: string
@@ -17,13 +18,17 @@ export async function SignInUser(values: SignInProps) {
       return { error: 'User does not exist', status: false }
     }
 
-    if (userExist.password !== values.password) {
+    const passwordMatch = await bcrypt.compare(
+      values.password,
+      userExist.password,
+    )
+
+    if (!passwordMatch) {
       return { error: 'Wrong password', status: false }
     } else {
       return { message: 'User logged in', user: userExist, status: true }
     }
   } catch (error) {
-    console.log(error)
     return { error: 'Something went wrong', status: false }
   }
 }

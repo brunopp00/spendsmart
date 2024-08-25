@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcrypt'
 
 interface SignUpProps {
   email: string
@@ -19,15 +20,20 @@ export async function SignUpUser(values: SignUpProps) {
       return { error: 'User already exist', status: false }
     }
 
-    await prisma.user.create({
-      data: {
-        email,
-        password,
-        name: username,
-      },
-    })
-    return { message: 'User created', status: true }
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    await prisma.user
+      .create({
+        data: {
+          email,
+          password: hashedPassword,
+          name: username,
+        },
+      })
+      .then((res) => {
+        return { message: 'User created', user: res, status: true }
+      })
   } catch (error) {
-    return { error: 'Something went wrong', status: false }
+    return { error: 'Something went wrong', user: null, status: false }
   }
 }

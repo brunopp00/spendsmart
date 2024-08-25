@@ -1,5 +1,6 @@
 import { UserProps } from '@/types/user'
 import { create } from 'zustand'
+import nookies from 'nookies'
 
 type ActionsProsp = {
   addUser: (user: UserProps) => void
@@ -20,11 +21,18 @@ export const useUserStore = create<StoreProps>((set) => ({
   actions: {
     addUser: (user) => {
       set(() => ({ state: { user } }))
-      window.localStorage.setItem('userSpendSmart', JSON.stringify(user))
+      // Armazenar o token de autenticação em um cookie seguro
+      nookies.set(null, 'userToken', JSON.stringify(user), {
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      })
     },
     removeUser: () => {
       set(() => ({ state: { user: null } }))
-      window.localStorage.removeItem('userSpendSmart')
+      // Remover o cookie de autenticação
+      nookies.destroy(null, 'userToken')
     },
   },
 }))
