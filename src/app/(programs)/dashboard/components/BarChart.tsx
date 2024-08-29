@@ -1,15 +1,12 @@
 'use client'
 
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { Area, AreaChart, XAxis, YAxis } from 'recharts'
 
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 import { ChartDataProps } from '../page'
 
 interface BarChartProps {
@@ -18,26 +15,54 @@ interface BarChartProps {
 
 export const BarChartDashboard = ({ chartData }: BarChartProps) => {
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <LineChart data={chartData} style={{ fontSize: 12 }}>
-        <XAxis dataKey="mes" tickLine={false} axisLine={false} dy={16} />
-        <YAxis
-          stroke="#888"
-          width={80}
-          axisLine={false}
-          tickLine={false}
-          tickFormatter={(value: number) =>
-            value.toLocaleString('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            })
-          }
+    <ChartContainer
+      config={{
+        time: {
+          color: 'black',
+        },
+      }}
+    >
+      <AreaChart
+        accessibilityLayer
+        data={chartData}
+        margin={{
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        }}
+      >
+        <XAxis dataKey="mes" hide />
+        <YAxis domain={['dataMin - 5', 'dataMax + 2']} hide />
+        <defs>
+          <linearGradient id="fillTime" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="black" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="black" stopOpacity={0.1} />
+          </linearGradient>
+        </defs>
+        <Area
+          dataKey="valor"
+          type="natural"
+          fill="url(#fillTime)"
+          fillOpacity={0.4}
+          stroke="black"
         />
-
-        <CartesianGrid className="stroke-muted" vertical={false} />
-        <Tooltip />
-        <Line type="linear" strokeWidth={2} dataKey="valor" />
-      </LineChart>
-    </ResponsiveContainer>
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent hideLabel />}
+          formatter={(value) => (
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              Gasto no mês:
+              <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
+                {value.toLocaleString('pt-BR', {
+                  currency: 'BRL',
+                  style: 'currency',
+                })}
+              </div>
+            </div>
+          )}
+        />
+      </AreaChart>
+    </ChartContainer>
   )
 }
